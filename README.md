@@ -149,32 +149,80 @@ The password generator uses the micro:bit's hardware random number generator for
 
 ## Bluetooth Connectivity Details
 
-The password generator uses the micro:bit's built-in Bluetooth capabilities to send passwords securely to paired devices. Specifically, it uses the Bluetooth Low Energy (BLE) UART service, which allows the micro:bit to send data wirelessly to other devices.
+The micro:bit uses its built-in UART over Bluetooth capability to share passwords wirelessly. This approach works on both micro:bit v1 and v2.
 
-### How the Bluetooth Transfer Works:
+### How Bluetooth Works on micro:bit:
 
-1. When you press button B, the micro:bit initializes its Bluetooth UART service
-2. The password is encoded as UTF-8 and transmitted
-3. A newline character is sent at the end to signal completion
-4. The receiving device needs to be paired with the micro:bit and listening for UART data
+- The micro:bit automatically makes Bluetooth services available
+- The UART service is used to send text data wirelessly
+- No explicit Bluetooth setup is needed in the code
+
+### Connecting to Your micro:bit:
+
+1. **After deploying the code**:
+   - The micro:bit will display "Ready" when it starts up
+
+2. **On your mobile device or computer**:
+   - Go to Bluetooth settings
+   - Turn on Bluetooth and scan for devices
+   - Look for "BBC micro:bit" in the list of available devices
+   - Select it to pair - no PIN code should be required
+
+3. **Receiving passwords**:
+   - Once paired, use an app that can receive UART data over Bluetooth
+   - For Android/iOS: Use "nRF Connect" or "micro:bit" app
+   - For PC/Mac: Use a Bluetooth terminal application
+
+4. **To send a password**:
+   - First press Button A to generate a password
+   - Then press Button B to send it via Bluetooth
+   - Your connected device should receive the password
+
+### Troubleshooting Bluetooth Issues:
+
+If your device is not appearing in the Bluetooth scan:
+
+1. **Reset your micro:bit**:
+   - Press the reset button on the back of the device
+   - Wait for it to restart and display "BT Ready"
+
+2. **Restart Bluetooth on your receiving device**:
+   - Turn Bluetooth off and back on
+   - Try restarting your device completely
+
+3. **Check compatibility**:
+   - Ensure your device supports Bluetooth 4.0 or later
+   - Micro:bit uses Bluetooth Low Energy (BLE), not classic Bluetooth
+
+4. **Consider interference**:
+   - Keep the micro:bit close to your device when pairing
+   - Move away from sources of radio interference
+
+The code is intentionally simplified to maximize compatibility and avoid memory issues, while still providing reliable Bluetooth connectivity.
 
 ### Compatible Apps for Receiving Passwords:
 
-To receive passwords on your mobile device, you can use:
+For Android:
+- **nRF Connect** (search "nRF Connect" in Google Play Store)
+- **Bluetooth Terminal** 
+- **micro:bit** official app
 
-- **nRF Connect** (available for iOS and Android)
-- **Bluetooth Terminal** apps (search your app store)
-- **micro:bit apps** like the official micro:bit app
+For iOS:
+- **nRF Connect for Mobile** (App Store)
+- **Bluetooth Terminal**
+- **micro:bit** official app
 
-### Pairing Instructions:
+### Example: Receiving with nRF Connect
 
-1. Turn on Bluetooth on your receiving device
-2. Open the compatible app (e.g., nRF Connect)
-3. Scan for devices and look for your micro:bit (usually appears as "BBC micro:bit")
-4. Select it to pair
-5. Once paired, you should be able to receive the passwords when you press button B
+1. Open nRF Connect app
+2. Tap "SCAN" to find your micro:bit
+3. Connect to your micro:bit
+4. Look for the UART service
+5. Open the service and monitor for incoming data
+6. Press Button B on your micro:bit to send a password
+7. The password will appear in the app's terminal view
 
-Note: Bluetooth range is typically limited to about 10 meters (30 feet) in ideal conditions.
+Note: If you have trouble connecting, try resetting the micro:bit and restarting Bluetooth on your phone.
 
 ## Limitations and Future Improvements
 

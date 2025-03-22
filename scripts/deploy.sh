@@ -1,67 +1,72 @@
 #!/bin/bash
 
-echo "Deploying micro:bit code..."
+echo "Deploying absolute minimal password generator..."
 
-# Get the project root directory (parent of scripts directory)
+# Get project root
 PROJECT_ROOT="$(dirname "$(dirname "$(readlink -f "$0")")")"
-MAIN_PY="${PROJECT_ROOT}/main.py"
-TEMP_PY="${PROJECT_ROOT}/main_deploy.py"
 
-# Check python environment path
-echo "Python executable: $(which python3)"
-echo "PATH: $PATH"
+# Create temporary minimal file
+TMP_PY="${PROJECT_ROOT}/minimal.py"
 
-# Create a temporary copy and replace f-strings and other incompatible features
-echo "Converting code to MicroPython compatible format..."
-cat "${MAIN_PY}" | 
-  sed 's/f"\([^"]*\){/"\1" + str(/g; s/}"/)/g' |
-  sed 's/import random, string/import random/' > "${TEMP_PY}"
+cat > "${TMP_PY}" << 'EOF'
+from microbit import *
+import random
 
-# Skip microfs check and go straight to flashing
-echo "Skipping connection check and proceeding to flash the device..."
+# Shorter character set to save memory
+CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$"
 
-# Try to find uflash - first check if it's in PATH
-UFLASH_CMD=$(which uflash 2>/dev/null)
+# Basic UART setup - should work for both USB and Bluetooth
+uart.init(baudrate=9600)
 
-# If not in PATH, try using the full path in the virtual environment
-if [ -z "$UFLASH_CMD" ]; then
-    echo "uflash not found in PATH, trying to find it in virtual environment..."
-    VENV_BIN="${PROJECT_ROOT}/.venv/bin"
+# Let user know we're ready
+display.scroll("Ready")
+
+# Main loop - absolute minimum version
+while True:
+    if button_a.was_pressed():
+        # Generate a simple 8-char password
+        pwd = ""
+        for i in range(8):
+            pwd += CHARS[random.randint(0, len(CHARS)-1)]
+        
+        # Show password
+        display.scroll(pwd[:5] + "...")
     
-    if [ -x "${VENV_BIN}/uflash" ]; then
-        UFLASH_CMD="${VENV_BIN}/uflash"
-        echo "Found uflash at ${UFLASH_CMD}"
-    else
-        echo "uflash not found in virtual environment either."
-        echo "Make sure you have activated your virtual environment with:"
-        echo "source .venv/bin/activate"
-        echo "and installed the required tools with:"
-        echo "./scripts/install_tools.sh"
-        rm "${TEMP_PY}"
-        exit 1
-    fi
-fi
+    if button_b.was_pressed():
+        # Check if we have a password
+        if 'pwd' in globals() and pwd:
+            # Send via UART
+            uart.write(pwd)
+            display.scroll("Sent")
+        else:
+            display.scroll("No pwd")
+    
+    # Sleep to prevent CPU overuse
+    sleep(100)
+EOF
 
-# Flash the temporary file to the micro:bit
-echo "Flashing with command: ${UFLASH_CMD} ${TEMP_PY}"
-if "${UFLASH_CMD}" "${TEMP_PY}"; then
-    echo "Main code successfully flashed to micro:bit!"
-    echo "Using main.py from: ${MAIN_PY}"
+echo "Deploying with uflash..."
+python -m uflash "${TMP_PY}"
+
+if [ $? -eq 0 ]; then
+    echo "Deployment successful!"
+    echo ""
+    echo "PAIRING INSTRUCTIONS:"
+    echo "1. After the micro:bit starts, it will show 'Ready'"
+    echo "2. To pair with your phone or computer:"
+    echo "   - Press and hold both A and B buttons simultaneously"
+    echo "   - Keep holding for 3-5 seconds until you see a Bluetooth symbol"
+    echo "   - This activates the micro:bit's built-in pairing mode"
+    echo "3. On your device, scan for Bluetooth devices and select 'BBC micro:bit'"
+    echo ""
+    echo "USAGE:"
+    echo "- Press A to generate a password (first 5 characters shown)"
+    echo "- Press B to send the current password via Bluetooth UART"
+    
     # Cleanup
-    rm "${TEMP_PY}"
+    rm "${TMP_PY}"
 else
-    echo "Error flashing code. Please check if micro:bit is connected properly."
-    rm "${TEMP_PY}"
+    echo "Deployment failed."
+    rm "${TMP_PY}"
     exit 1
 fi
-
-echo "Deployment complete!"
-echo "Reminder: All code is now in the main.py file - no need to transfer other modules."
-echo "If you see error codes on the micro:bit, try pressing the reset button."
-echo ""
-echo "IMPORTANT: If you're using a virtual environment, ensure it's activated with:"
-echo "source .venv/bin/activate"
-echo ""
-echo "If uflash still isn't found, you may need to install it directly:"
-echo "pip install --user uflash==2.0.0"
-echo "And then try again after restarting your terminal or running: source ~/.bashrc"
