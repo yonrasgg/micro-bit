@@ -6,27 +6,27 @@ A secure password generation and management system for BBC micro:bit devices. Th
 
 ```
 /micro-bit/
-├── main.py                # Main program with all necessary functionality
+├── main.py                # Main program with simplified, working functionality
 ├── scripts/               # Helper scripts for development and deployment
 │   ├── install_tools.sh   # Script to install required development tools
-│   └── deploy.sh          # Script to deploy code to micro:bit
+│   └── deploy.sh          # Script to deploy code to micro:bit (renamed from simplified_deploy.sh)
 ├── README.md              # This documentation file
 └── requirements.txt       # Project dependencies
 ```
 
-## Code Overview
+## Functionality
 
-The main.py file includes all necessary functionality:
+- **Button A**: Generate a new password and display its first 5 characters
+- **Button B**: Send the last generated password via Bluetooth
 
-- **Password Generation**: Creates secure random passwords with configurable parameters like length, number of digits, and special characters.
+## Current Implementation
 
-- **Bluetooth Communication**: Manages Bluetooth communication to send passwords to paired devices.
+The current implementation uses a simplified approach to work reliably on the micro:bit hardware:
 
-- **Display Management**: Controls the micro:bit's LED display to show messages and password feedback.
-
-- **Button Input**: Handles button press detection and input processing.
-
-- **Environment Detection**: Detects whether the code is running on a physical micro:bit or in development mode.
+- Generates 8-character passwords for improved performance
+- Uses direct microbit module imports for better compatibility
+- Minimizes memory usage to avoid 504 errors
+- Offers full password generation and Bluetooth sending capabilities
 
 ## Development Setup
 
@@ -53,81 +53,50 @@ The main.py file includes all necessary functionality:
    ./scripts/install_tools.sh
    ```
 
-4. Open a new terminal or reload your environment:
-   ```bash
-   source ~/.bashrc
-   ```
-
-### Working with micro:bit Connected to PC
-
-1. Connect your micro:bit via USB cable to your computer
-
-2. Verify connection:
-   - On Windows: Check Device Manager for a new COM port
-   - On macOS: Run `ls /dev/tty.*` to see the device (usually appears as `/dev/tty.usbmodem*`)
-   - On Linux: Run `ls /dev/ttyACM*` to see the device
-
-## Functionality
-
-- **Button A**: Generate a new secure password
-- **Button B**: Send the last generated password via Bluetooth
-
-## Error Handling
-
-- Prevents sending when no password has been generated
-- Provides feedback on success/failure of operations
-
-## Development & Deployment
-
-### Development Mode (Simulation)
-
-This code can be run on your computer for testing without an actual micro:bit:
-```bash
-# Make sure your virtual environment is activated
-python3 main.py
-```
-
-### Deployment to micro:bit
+## Deployment to micro:bit
 
 To deploy the code to your micro:bit device:
 
-1. Make sure your virtual environment is activated and tools installed (see Setup above)
+1. Make sure your virtual environment is activated:
+   ```bash
+   source .venv/bin/activate
+   ```
 
 2. Connect your micro:bit via USB
 
-3. Run the deployment script:
+3. Use the deployment script:
    ```bash
    chmod +x scripts/deploy.sh
    ./scripts/deploy.sh
    ```
 
-The script will flash the main.py file to your micro:bit and handle all the necessary setup.
+This will deploy the ultra-simplified version that has been confirmed to work properly.
+
+## Testing the Application
+
+1. After deployment, you should see "Ready" scroll across the micro:bit's LED display
+2. Press button A to generate a password - you'll see the first 5 characters followed by "OK"
+3. Press button B to send the password via Bluetooth - you'll see "Sent" on success
 
 ## Troubleshooting
 
+### If you see error code 504:
+- Use the deploy.sh script which deploys code optimized to avoid this error
+- Try pressing the reset button on the micro:bit
+- Make sure you're using the latest version of the code from this repository
+
 ### Common Issues
 
-1. **"No module named 'microbit'"**: 
-   - This is expected when running in simulation mode
-   - The code will automatically use the mock implementation
-
-2. **USB Connection Issues**:
+1. **USB Connection Issues**:
    - Try unplugging and reconnecting the micro:bit
    - Try a different USB cable
    - Ensure you have the correct permissions to access the USB device
 
-3. **Missing Commands After Installation**:
-   - If the `uflash` or `microfs` commands are not found after running install_tools.sh:
-   - Try opening a new terminal window
-   - Run `source ~/.bashrc` to reload your environment
-   - Check if ~/.local/bin is in your PATH with `echo $PATH`
+2. **Bluetooth Pairing**:
+   - Make sure your receiving device is paired with the micro:bit
+   - Keep devices close together during transmission
+   - Check the receiving device has Bluetooth enabled
 
-### Checking micro:bit Status
+## Development Notes
 
-If you need to manually check if your micro:bit is properly connected:
-
-```bash
-uflash --help
-```
-
-This should display the help information for the uflash tool if it's properly installed.
+The code has been simplified to ensure reliable operation on the micro:bit hardware. While more complex password generation algorithms were implemented in earlier versions, the current version prioritizes stability and core functionality.
