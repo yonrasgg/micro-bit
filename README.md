@@ -147,6 +147,35 @@ The code is intentionally simplified to work within the micro:bit's limited memo
 
 The password generator uses the micro:bit's hardware random number generator for better randomness, and the program is optimized to use minimal memory while still providing secure passwords.
 
+## Bluetooth Connectivity Details
+
+The password generator uses the micro:bit's built-in Bluetooth capabilities to send passwords securely to paired devices. Specifically, it uses the Bluetooth Low Energy (BLE) UART service, which allows the micro:bit to send data wirelessly to other devices.
+
+### How the Bluetooth Transfer Works:
+
+1. When you press button B, the micro:bit initializes its Bluetooth UART service
+2. The password is encoded as UTF-8 and transmitted
+3. A newline character is sent at the end to signal completion
+4. The receiving device needs to be paired with the micro:bit and listening for UART data
+
+### Compatible Apps for Receiving Passwords:
+
+To receive passwords on your mobile device, you can use:
+
+- **nRF Connect** (available for iOS and Android)
+- **Bluetooth Terminal** apps (search your app store)
+- **micro:bit apps** like the official micro:bit app
+
+### Pairing Instructions:
+
+1. Turn on Bluetooth on your receiving device
+2. Open the compatible app (e.g., nRF Connect)
+3. Scan for devices and look for your micro:bit (usually appears as "BBC micro:bit")
+4. Select it to pair
+5. Once paired, you should be able to receive the passwords when you press button B
+
+Note: Bluetooth range is typically limited to about 10 meters (30 feet) in ideal conditions.
+
 ## Limitations and Future Improvements
 
 - Current implementation uses 8-character passwords to avoid memory issues
