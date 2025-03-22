@@ -6,36 +6,27 @@ A secure password generation and management system for BBC micro:bit devices. Th
 
 ```
 /micro-bit/
-├── main.py                # Main program entry point and application logic
-├── password_generator.py  # Functions for generating secure passwords
-├── bluetooth_manager.py   # Handles Bluetooth communication 
-├── display_manager.py     # Controls the micro:bit LED display
-├── button_manager.py      # Manages button input detection
-├── hardware.py            # Hardware abstraction layer for micro:bit features
-├── env.py                 # Environment detection (micro:bit vs simulation)
-├── utils.py               # Common utility functions
-├── config.py              # Application configuration parameters
-├── microbit_mock.py       # Simulation of micro:bit for development
+├── main.py                # Main program with all necessary functionality
+├── scripts/               # Helper scripts for development and deployment
+│   ├── install_tools.sh   # Script to install required development tools
+│   └── deploy.sh          # Script to deploy code to micro:bit
+├── README.md              # This documentation file
 └── requirements.txt       # Project dependencies
 ```
 
 ## Code Overview
 
-- **main.py**: Entry point that coordinates all modules. Handles the main program flow, initializing the password generator and managing user input.
-  
-- **password_generator.py**: Generates secure random passwords with configurable parameters like length, number of digits, and special characters.
+The main.py file includes all necessary functionality:
 
-- **bluetooth_manager.py**: Manages Bluetooth communication to send passwords to paired devices.
+- **Password Generation**: Creates secure random passwords with configurable parameters like length, number of digits, and special characters.
 
-- **display_manager.py**: Controls the micro:bit's LED display to show messages and password feedback.
+- **Bluetooth Communication**: Manages Bluetooth communication to send passwords to paired devices.
 
-- **button_manager.py**: Handles button press detection and input processing.
+- **Display Management**: Controls the micro:bit's LED display to show messages and password feedback.
 
-- **hardware.py**: Provides a hardware abstraction layer that works on both the actual micro:bit and in simulation mode.
+- **Button Input**: Handles button press detection and input processing.
 
-- **env.py**: Detects whether the code is running on a physical micro:bit or in development mode.
-
-- **config.py**: Contains configuration settings like password length and complexity requirements.
+- **Environment Detection**: Detects whether the code is running on a physical micro:bit or in development mode.
 
 ## Development Setup
 
@@ -43,7 +34,7 @@ A secure password generation and management system for BBC micro:bit devices. Th
 
 1. Create a virtual environment:
    ```bash
-   python -m venv .venv
+   python3 -m venv .venv
    ```
 
 2. Activate the virtual environment:
@@ -56,9 +47,15 @@ A secure password generation and management system for BBC micro:bit devices. Th
      source .venv/bin/activate
      ```
 
-3. Install dependencies:
+3. Install Required Tools:
    ```bash
-   pip install -r requirements.txt
+   chmod +x scripts/install_tools.sh
+   ./scripts/install_tools.sh
+   ```
+
+4. Open a new terminal or reload your environment:
+   ```bash
+   source ~/.bashrc
    ```
 
 ### Working with micro:bit Connected to PC
@@ -69,11 +66,6 @@ A secure password generation and management system for BBC micro:bit devices. Th
    - On Windows: Check Device Manager for a new COM port
    - On macOS: Run `ls /dev/tty.*` to see the device (usually appears as `/dev/tty.usbmodem*`)
    - On Linux: Run `ls /dev/ttyACM*` to see the device
-
-3. Development workflow:
-   - Make changes to the code
-   - Test in simulation mode: `python main.py`
-   - When ready to test on hardware, follow the deployment instructions below
 
 ## Functionality
 
@@ -89,39 +81,27 @@ A secure password generation and management system for BBC micro:bit devices. Th
 
 ### Development Mode (Simulation)
 
-This code can be run on your computer for testing using the mock microbit module:
+This code can be run on your computer for testing without an actual micro:bit:
 ```bash
 # Make sure your virtual environment is activated
-python main.py
+python3 main.py
 ```
 
 ### Deployment to micro:bit
 
 To deploy the code to your micro:bit device:
 
-1. Make sure your virtual environment is activated and dependencies installed:
-   ```bash
-   pip install -r requirements.txt
-   ```
+1. Make sure your virtual environment is activated and tools installed (see Setup above)
 
 2. Connect your micro:bit via USB
 
-3. Flash the main code:
+3. Run the deployment script:
    ```bash
-   uflash main.py
+   chmod +x scripts/deploy.sh
+   ./scripts/deploy.sh
    ```
 
-4. Transfer additional module files:
-   ```bash
-   microfs put password_generator.py
-   microfs put bluetooth_manager.py
-   microfs put display_manager.py
-   microfs put button_manager.py
-   microfs put hardware.py
-   microfs put env.py
-   microfs put utils.py
-   microfs put config.py
-   ```
+The script will flash the main.py file to your micro:bit and handle all the necessary setup.
 
 ## Troubleshooting
 
@@ -136,17 +116,18 @@ To deploy the code to your micro:bit device:
    - Try a different USB cable
    - Ensure you have the correct permissions to access the USB device
 
-3. **File Transfer Errors**:
-   - Make sure the micro:bit is properly connected
-   - Ensure the micro:bit is not in a busy state
-   - Try rebooting the micro:bit by disconnecting and reconnecting
+3. **Missing Commands After Installation**:
+   - If the `uflash` or `microfs` commands are not found after running install_tools.sh:
+   - Try opening a new terminal window
+   - Run `source ~/.bashrc` to reload your environment
+   - Check if ~/.local/bin is in your PATH with `echo $PATH`
 
 ### Checking micro:bit Status
 
-To check if your micro:bit is properly connected and accessible:
+If you need to manually check if your micro:bit is properly connected:
 
 ```bash
-microfs ls
+uflash --help
 ```
 
-This should list the files currently on your micro:bit.
+This should display the help information for the uflash tool if it's properly installed.
