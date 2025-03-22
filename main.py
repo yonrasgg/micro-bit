@@ -1,5 +1,3 @@
-# Ultra-simplified version to avoid 504 errors
-
 # Import only what's absolutely needed for microbit
 import random
 from microbit import button_a, button_b, display, uart, sleep
@@ -33,7 +31,7 @@ def send_via_bluetooth(data):
     uart.init(baudrate=9600)
     uart.write(data)
 
-# Main loop - ultra simplified
+# Main loop 
 def main():
     display.scroll("Ready")
     password = None
